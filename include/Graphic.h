@@ -14,11 +14,13 @@ namespace gui {
 		static void set_graphic_setting(GraphicSetting setting);
 
 		static void set_color(double r, double g, double b);
+		static void set_flag(bool flag);
 
 	private:
 		static double color_r;
 		static double color_g;
 		static double color_b;
+		static bool flag;
 
 		static int width_pixel;
 		static int height_pixel;
@@ -34,6 +36,8 @@ namespace gui {
 		static void glut_menu(int);
 		static void glut_keyboard(unsigned char key, int x, int y);
 		// static void update_workspace();
+
+		static void draw_flag();
 	};
 }
 

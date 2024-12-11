@@ -1,5 +1,4 @@
 #include "Graphic.h"
-#include "GraphicUtils.h"
 
 #include <Windows.h>
 #include <GL/gl.h>
@@ -27,6 +26,25 @@ namespace gui_impl {
 		corner[3][0] = center[0] - width / 2;
 		corner[3][1] = center[1] + height / 2;
 	}
+
+	void drawSquareFill(double pos[4][2], double r, double g, double b) {
+		// 2D•`‰æ‚È‚Ì‚ÅŒõŒ¹ˆ—‚ğ–³Œø‚É
+		glDisable(GL_LIGHTING);
+
+		// F
+		glColor3d(r, g, b);
+		glEnable(GL_COLOR_MATERIAL);
+
+		// •`‰æ
+		//glBegin(GL_QUADS);
+		glBegin(GL_POLYGON);
+		for (int i = 0; i < 4; ++i) {
+			glVertex2f(pos[i][0], pos[i][1]);
+		}
+		glEnd();
+
+		glEnable(GL_LIGHTING);
+	}
 }
 
 namespace gui {
@@ -38,6 +56,7 @@ namespace gui {
 	double Graphic::color_r = 0;
 	double Graphic::color_g = 0;
 	double Graphic::color_b = 0;
+	bool Graphic::flag = false;
 
 	GraphicSetting Graphic::setting = GraphicSetting();
 
@@ -156,11 +175,36 @@ namespace gui {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glClearColor(Graphic::color_r, Graphic::color_g, Graphic::color_b, 1.0);		
+
+		if (Graphic::flag) {
+			Graphic::draw_flag();
+		}
+	}
+
+	void Graphic::draw_flag() {
+		double case_width = 31;
+		double case_height = 36;
+		double flag_width = 10;
+		double flag_height = 20;
+
+		double pos[2] = {
+			Graphic::width_world - case_width / 2,
+			Graphic::height_world - case_height / 2,
+		};
+
+
+		double corners[4][2];
+		gui_impl::cwh_to_corners(pos, flag_width, flag_height, corners);
+		gui_impl::drawSquareFill(corners, 1, 1, 1);
 	}
 
 	void Graphic::set_color(double r, double g, double b) {
 		Graphic::color_r = r;
 		Graphic::color_g = g;
 		Graphic::color_b = b;
+	}
+
+	void Graphic::set_flag(bool flag) {
+		Graphic::flag = flag;
 	}
 }

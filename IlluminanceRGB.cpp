@@ -29,8 +29,18 @@ void save_rgb(double r, double g, double b) {
 	outFile << r << ", " << g << ", " << b << std::endl;
 }
 
-void set_color(double r, double g, double b, double duration_sec) {
+void set_color(double r, double g, double b, double duration_sec, bool flag) {
 	gui::Graphic::set_color(r, g, b);
+	gui::Graphic::set_flag(flag);
+
+	//double flag_sec = 0.1;
+	double flag_sec = 1;
+	if (flag_sec < duration_sec) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<long long>(flag_sec * 1000)));
+		gui::Graphic::set_flag(false);
+		duration_sec -= flag_sec;
+	}
+
 	std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<long long>(duration_sec * 1000)));
 	save_rgb(r, g, b);
 }
@@ -40,14 +50,14 @@ void run(std::string file_path, bool flag) {
 
 	// 各色
 	for (auto&& e : data) {
-		set_color(e.r, e.g, e.b, e.t);
+		set_color(e.r, e.g, e.b, e.t, flag);
 		if (e.interval_t > 0) {
-			set_color(0.0, 0.0, 0.0, e.interval_t);
+			set_color(0.0, 0.0, 0.0, e.interval_t, false);
 		}
 	}
 
 	// 終了処理
-	set_color(1.0, 1.0, 1.0, 5);
+	set_color(1.0, 1.0, 1.0, 5, false);
 }
 
 void create_output_dir() {

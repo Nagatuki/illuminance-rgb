@@ -35,10 +35,8 @@ void set_color(double r, double g, double b, double duration_sec) {
 	save_rgb(r, g, b);
 }
 
-void run() {
-	std::string file_name;
-	std::cin >> file_name;
-	auto data = read_csv(file_name);
+void run(std::string file_path, bool flag) {
+	auto data = read_csv(file_path);
 
 	// 各色
 	for (auto&& e : data) {
@@ -54,23 +52,39 @@ void run() {
 
 void create_output_dir() {
 	const std::string directory = "./output";
-
-	try {
-		// ディレクトリを作成
-		if (std::filesystem::create_directory(directory)) {
-			std::cout << "Directory created: " << directory << std::endl;
-		}
-		else {
-			std::cout << "Directory already exists or could not be created: " << directory << std::endl;
-		}
-	}
-	catch (const std::filesystem::filesystem_error& e) {
-		std::cerr << "Error: " << e.what() << std::endl;
+	if (std::filesystem::create_directory(directory)) {
+		std::cout << "Directory created: " << directory << std::endl;
 	}
 }
 
 int main(int argc, char** argv)
 {
+	// 実行時引数の解析
+	if (argc < 2) {
+		std::cerr << "Usage: " << argv[0] << " <file_path> [flag (0 or 1)]" << std::endl;
+		return 1; // エラーコード
+	}
+
+	// 第1引数: ファイルパス
+	std::string file_path = argv[1];
+
+	// 第2引数: フラグ (0または1)
+	bool flag = false;
+	if (argc == 3) {
+		std::string flag_arg = argv[2];
+
+		if (flag_arg == "0") {
+			flag = false;
+		}
+		else if (flag_arg == "1") {
+			flag = true;
+		}
+		else {
+			std::cerr << "Error: Flag must be '0' or '1'." << std::endl;
+			return 1;
+		}
+	}
+
 	std::cout << "initialize" << std::endl;
 
 	create_output_dir();
@@ -82,7 +96,7 @@ int main(int argc, char** argv)
     gui::Graphic::initialize(argc, argv);
 
 	std::cout << "start" << std::endl;
-	std::thread th(run);
+	std::thread th(run, file_path, flag);
 	gui::Graphic::loop();
 
 	th.join();

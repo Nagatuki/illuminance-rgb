@@ -1,0 +1,6 @@
+/.vs
+/output
+/build
+
+/libs/*
+!/libs/.gitignore

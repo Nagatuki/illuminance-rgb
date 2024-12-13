@@ -53,6 +53,10 @@ namespace gui {
 	double Graphic::width_world = 100;
 	double Graphic::height_world = 100;
 
+	bool Graphic::is_fullscreen = false;
+	int Graphic::window_pos_x = 0;
+	int Graphic::window_pos_y = 0;
+
 	double Graphic::color_r = 0;
 	double Graphic::color_g = 0;
 	double Graphic::color_b = 0;
@@ -61,6 +65,8 @@ namespace gui {
 	GraphicSetting Graphic::setting = GraphicSetting();
 
 	void Graphic::initialize(int argc, char** argv) {
+		Graphic::is_fullscreen = false;
+
 		glutInit(&argc, argv);
 
 		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
@@ -76,6 +82,7 @@ namespace gui {
 
 		//GLUI_Master.set_glutKeyboardFunc(glutKeyboard);
 		glutKeyboardFunc(glut_keyboard);
+		glutSpecialFunc(glut_special_keyboard);
 
 		glutCreateMenu(glut_menu);
 		glutAddMenuEntry("Quit", 0);
@@ -129,8 +136,8 @@ namespace gui {
 	void Graphic::glut_reshape(int width_px, int height_px) {
 		std::cout << "width = " << width_px << std::endl;
 		std::cout << "height = " << height_px << std::endl;
-		gui::Graphic::width_pixel = width_px;  // [pixels]
-		gui::Graphic::height_pixel = height_px;  // [pixels]
+		Graphic::width_pixel = width_px;  // [pixels]
+		Graphic::height_pixel = height_px;  // [pixels]
 
 		glViewport(0, 0, width_px, height_px);
 
@@ -168,16 +175,41 @@ namespace gui {
 	}
 
 	void Graphic::glut_keyboard(unsigned char key, int x, int y) {
-		// ignore key input
+		if (key == 27) {  // ESCキー
+			if (Graphic::is_fullscreen) {
+				toggle_fullscreen(false);  // 全画面解除
+			}
+		}
+	}
+
+	void Graphic::glut_special_keyboard(int key, int x, int y) {
+		if (key == GLUT_KEY_F11) {
+			toggle_fullscreen(!Graphic::is_fullscreen);  // 全画面の切り替え
+		}
 	}
 
 	void Graphic::draw() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glClearColor(Graphic::color_r, Graphic::color_g, Graphic::color_b, 1.0);		
+		glClearColor(Graphic::color_r, Graphic::color_g, Graphic::color_b, 1.0);
 
 		if (Graphic::flag) {
 			Graphic::draw_flag();
+		}
+	}
+
+	void Graphic::toggle_fullscreen(bool is_fullscreen) {
+		Graphic::is_fullscreen = is_fullscreen;
+		if (is_fullscreen) {
+			// 全画面モードに切り替え
+			Graphic::window_pos_x = glutGet(GLUT_WINDOW_X);
+			Graphic::window_pos_y = glutGet(GLUT_WINDOW_Y);
+			glutFullScreen();
+		}
+		else {
+			// 全画面を解除
+			glutReshapeWindow(Graphic::width_pixel, Graphic::height_pixel);
+			glutPositionWindow(Graphic::window_pos_x, Graphic::window_pos_y);
 		}
 	}
 

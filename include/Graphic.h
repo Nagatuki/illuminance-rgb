@@ -27,6 +27,10 @@ namespace gui {
 		static double width_world;
 		static double height_world;
 
+		static bool is_fullscreen;
+		static int window_pos_x;
+		static int window_pos_y;
+
 		static GraphicSetting setting;
 
 		static void draw();
@@ -35,6 +39,10 @@ namespace gui {
 		static void glut_idle();
 		static void glut_menu(int);
 		static void glut_keyboard(unsigned char key, int x, int y);
+		static void glut_special_keyboard(int key, int x, int y);
+
+		static void toggle_fullscreen(bool is_fullscreen);
+
 		// static void update_workspace();
 
 		static void draw_flag();
